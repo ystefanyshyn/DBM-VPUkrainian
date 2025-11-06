@@ -8,7 +8,7 @@
 ## DefaultState: enabled
 ## RequiredDeps: DBM-Core
 ## Author: melles1991
-## Version: v1.5.1
+## Version: 1.5
 ## IconTexture: Interface\AddOns\DBM-Core\textures\dbm_airhorn
 ## X-Curse-Project-ID: 852433
 ## X-DBM-Voice: 1
