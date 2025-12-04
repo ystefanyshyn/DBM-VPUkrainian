@@ -1,4 +1,5 @@
-﻿## Interface: 11508
+## Interface: 50502, 50503
+## Category: DBM
 
 ## Title:|cffffe00a<|r|cffff7d0aDBM Media|r|cffffe00a>|r |cff308530Voicepack Ukrainian|r
 ## Title-ruRU:|cffffe00a<|r|cffff7d0aDBM Media|r|cffffe00a>|r |cff308530Слава Україні!|r
@@ -9,10 +10,11 @@
 ## RequiredDeps: DBM-Core
 ## Author: melles1991
 ## Version: 1.5
+## IconTexture: Interface\AddOns\DBM-Core\textures\dbm_airhorn
 ## X-Curse-Project-ID: 852433
 ## X-DBM-Voice: 1
 ## X-DBM-Voice-Name: Ukrainian Female
 ## X-DBM-Voice-Name-ruRU: Ukrainian Female
 ## X-DBM-Voice-ShortName: Ukrainian
-## X-DBM-Voice-Version: 17
+## X-DBM-Voice-Version: 18
 ## X-DBM-Voice-HasCount: 1
