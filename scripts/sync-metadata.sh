@@ -5,7 +5,7 @@
 # Updates: Interface versions and X-DBM-Voice-Version
 # Preserves: Author, Version, Voice names, and other Ukrainian-specific settings
 
-set -e
+set -e -o pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
@@ -23,7 +23,7 @@ mkdir -p "$TEMP_DIR"
 extract_metadata() {
     local file=$1
     local key=$2
-    grep "^## ${key}:" "$file" | sed "s/^## ${key}:\s*//" | sed 's/^[[:space:]]*//g' | sed 's/[[:space:]]*$//g'
+    grep "^## ${key}:" "$file" 2>/dev/null | sed "s/^## ${key}:\s*//" | sed 's/^[[:space:]]*//g' | sed 's/[[:space:]]*$//g' || true
 }
 
 # Download the Demo repository's TOC files via GitHub API
@@ -134,38 +134,52 @@ for toc_file in $UKRAINIAN_TOCS; do
     CURRENT_VOICE_VERSION=$(extract_metadata "$toc_file" "X-DBM-Voice-Version")
     CURRENT_INTERFACE=$(extract_metadata "$toc_file" "Interface")
     
+    # Debug output
+    echo "    → Demo Voice Version: [$DEMO_VOICE_VERSION]"
+    echo "    → Current Voice Version: [$CURRENT_VOICE_VERSION]"
+    echo "    → Demo Interface: [$DEMO_INTERFACE]"
+    echo "    → Current Interface: [$CURRENT_INTERFACE]"
+    
     CHANGES_MADE=false
     
     # Update X-DBM-Voice-Version if different
     if [ "$CURRENT_VOICE_VERSION" != "$DEMO_VOICE_VERSION" ]; then
         echo "    → Updating X-DBM-Voice-Version: $CURRENT_VOICE_VERSION → $DEMO_VOICE_VERSION"
         
-        # Trim any whitespace from the value
-        DEMO_VOICE_VERSION_CLEAN=$(echo "$DEMO_VOICE_VERSION" | tr -d ' ')
-        
+        set +e  # Temporarily disable exit on error
         if [[ "$OSTYPE" == "darwin"* ]]; then
-            sed -i '' "s/^## X-DBM-Voice-Version:.*$/## X-DBM-Voice-Version: $DEMO_VOICE_VERSION_CLEAN/" "$toc_file"
+            sed -i '' "s/^## X-DBM-Voice-Version:.*$/## X-DBM-Voice-Version: $DEMO_VOICE_VERSION/" "$toc_file"
         else
-            sed -i "s/^## X-DBM-Voice-Version:.*$/## X-DBM-Voice-Version: $DEMO_VOICE_VERSION_CLEAN/" "$toc_file"
+            sed -i "s/^## X-DBM-Voice-Version:.*$/## X-DBM-Voice-Version: $DEMO_VOICE_VERSION/" "$toc_file"
         fi
+        SED_EXIT=$?
+        set -e  # Re-enable exit on error
         
-        CHANGES_MADE=true
+        if [ $SED_EXIT -eq 0 ]; then
+            CHANGES_MADE=true
+        else
+            echo "    ⚠️  Warning: Failed to update X-DBM-Voice-Version in $toc_basename"
+        fi
     fi
     
     # Update Interface versions if different
     if [ "$CURRENT_INTERFACE" != "$DEMO_INTERFACE" ]; then
         echo "    → Updating Interface: $CURRENT_INTERFACE → $DEMO_INTERFACE"
         
-        # Trim any whitespace from the value
-        DEMO_INTERFACE_CLEAN=$(echo "$DEMO_INTERFACE" | tr -d ' ')
-        
+        set +e  # Temporarily disable exit on error
         if [[ "$OSTYPE" == "darwin"* ]]; then
-            sed -i '' "s/^## Interface:.*$/## Interface: $DEMO_INTERFACE_CLEAN/" "$toc_file"
+            sed -i '' "s/^## Interface:.*$/## Interface: $DEMO_INTERFACE/" "$toc_file"
         else
-            sed -i "s/^## Interface:.*$/## Interface: $DEMO_INTERFACE_CLEAN/" "$toc_file"
+            sed -i "s/^## Interface:.*$/## Interface: $DEMO_INTERFACE/" "$toc_file"
         fi
+        SED_EXIT=$?
+        set -e  # Re-enable exit on error
         
-        CHANGES_MADE=true
+        if [ $SED_EXIT -eq 0 ]; then
+            CHANGES_MADE=true
+        else
+            echo "    ⚠️  Warning: Failed to update Interface in $toc_basename"
+        fi
     fi
     
     if [ "$CHANGES_MADE" = true ]; then
