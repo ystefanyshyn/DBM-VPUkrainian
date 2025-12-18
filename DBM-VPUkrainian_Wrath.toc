@@ -14,5 +14,5 @@
 ## X-DBM-Voice-Name: Ukrainian Female
 ## X-DBM-Voice-Name-ruRU: Ukrainian Female
 ## X-DBM-Voice-ShortName: Ukrainian
-## X-DBM-Voice-Version: 17
+## X-DBM-Voice-Version: 18
 ## X-DBM-Voice-HasCount: 1
