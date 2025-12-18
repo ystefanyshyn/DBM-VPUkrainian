@@ -1,0 +1,69 @@
+name: Sync from Demo Repository
+
+on:
+  # Run daily at 2 AM UTC
+  schedule:
+    - cron: '0 2 * * *'
+  
+  # Allow manual trigger from GitHub Actions UI
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync-metadata:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Run metadata sync script
+        run: |
+          chmod +x scripts/sync-metadata.sh
+          ./scripts/sync-metadata.sh
+      
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if [[ -n $(git status --porcelain) ]]; then
+            echo "changes=true" >> $GITHUB_OUTPUT
+            echo "Changed files:"
+            git status --short
+          else
+            echo "changes=false" >> $GITHUB_OUTPUT
+            echo "No changes detected"
+          fi
+      
+      - name: Create Pull Request
+        if: steps.check_changes.outputs.changes == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'chore: sync TOC metadata from DBM-Voicepack-Demo'
+          title: 'Sync TOC Metadata from Demo Repository'
+          body: |
+            ## Automated Sync from DBM-Voicepack-Demo
+            
+            This PR was automatically created by the daily sync workflow.
+            
+            ### Changes
+            - Updated Interface versions and/or X-DBM-Voice-Version in TOC files
+            - Synced from: https://github.com/DeadlyBossMods/DBM-Voicepack-Demo
+            
+            ### Review Checklist
+            - [ ] Verify Interface versions match the correct WoW client versions
+            - [ ] Verify X-DBM-Voice-Version is correct
+            - [ ] Check that no unintended changes were made
+            
+            **Note**: This sync only updates metadata. Voice files still need to be recorded manually.
+          branch: sync/demo-metadata
+          branch-suffix: timestamp
+          delete-branch: true
+          labels: |
+            automated
+            sync
+            metadata
+          assignees: ${{ github.repository_owner }}
