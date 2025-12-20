@@ -42,6 +42,7 @@ jobs:
           fi
       
       - name: Create Pull Request
+        id: create_pr
         if: steps.check_changes.outputs.changes == 'true'
         uses: peter-evans/create-pull-request@v6
         with:
@@ -78,9 +79,10 @@ jobs:
 
 
       - name: Discord notification
+        if: steps.check_changes.outputs.changes == 'true'
         env:
             DISCORD_AVATAR: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
             DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
         uses: Ilshidur/action-discord@master
         with:
-            args: 'Метадані в {{ EVENT_PAYLOAD.repository.full_name }} було оновлено.'
+            args: 'Метадані в {{ EVENT_PAYLOAD.repository.full_name }} було оновлено. PR: ${{ steps.create_pr.outputs.pull-request-url }}'
