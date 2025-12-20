@@ -1,9 +1,9 @@
 name: Sync from Demo Repository
 
 on:
-  # Run daily at 2 AM UTC
+  # Run daily at 10 AM UTC
   schedule:
-    - cron: '0 2 * * *'
+    - cron: '0 10 * * *'
   
   # Allow manual trigger from GitHub Actions UI
   workflow_dispatch:
@@ -71,3 +71,14 @@ jobs:
             sync
             metadata
           assignees: ${{ github.repository_owner }}
+      
+      - name: Add Summary
+        run: |
+          echo "## ✅ Оновлення метадати завершено успішно" >> $GITHUB_STEP_SUMMARY
+
+      - name: Notify Discord on Failure
+        if: always()
+        uses: nebularg/actions-discord-webhook@v1
+        with:
+          webhook_url: ${{ secrets.WEBHOOK_URL }}
+          status: ${{ job.status }}
