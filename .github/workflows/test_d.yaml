@@ -15,9 +15,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       
-      - name: Notify Discord
-        if: always()
-        uses: nebularg/actions-discord-webhook@v1
+      - name: Discord notification
+        env:
+            DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        uses: Ilshidur/action-discord@master
         with:
-          webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          status: ${{ job.status }}
+            args: 'The project {{ EVENT_PAYLOAD.repository.full_name }} has been deployed.'
