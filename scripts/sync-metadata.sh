@@ -162,8 +162,8 @@ for toc_file in $UKRAINIAN_TOCS; do
         fi
     fi
     
-    # Update Interface versions if different
-    if [ "$CURRENT_INTERFACE" != "$DEMO_INTERFACE" ]; then
+    # Update Interface versions if different (or if current is empty)
+    if [ -z "$CURRENT_INTERFACE" ] || [ "$CURRENT_INTERFACE" != "$DEMO_INTERFACE" ]; then
         echo "    → Updating Interface: $CURRENT_INTERFACE → $DEMO_INTERFACE"
         
         set +e  # Temporarily disable exit on error
@@ -177,8 +177,9 @@ for toc_file in $UKRAINIAN_TOCS; do
         
         if [ $SED_EXIT -eq 0 ]; then
             CHANGES_MADE=true
+            echo "    ✓ Interface updated"
         else
-            echo "    ⚠️  Warning: Failed to update Interface in $toc_basename"
+            echo "    ⚠️  Warning: Failed to update Interface in $toc_basename (sed returned $SED_EXIT)"
         fi
     fi
     
