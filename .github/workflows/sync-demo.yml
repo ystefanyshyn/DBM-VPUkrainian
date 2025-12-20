@@ -76,9 +76,11 @@ jobs:
         run: |
           echo "## ✅ Оновлення метадати завершено успішно" >> $GITHUB_STEP_SUMMARY
 
-      - name: Notify Discord
-        if: always()
-        uses: nebularg/actions-discord-webhook@v1
+
+      - name: Discord notification
+        env:
+            DISCORD_AVATAR: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
+            DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        uses: Ilshidur/action-discord@master
         with:
-          webhook_url: ${{ secrets.WEBHOOK_URL }}
-          status: ${{ job.status }}
+            args: 'Метадані в {{ EVENT_PAYLOAD.repository.full_name }} було оновлено.'
